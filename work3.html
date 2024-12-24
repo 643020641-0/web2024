@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  </head>
+  <body>
+    <div id="myapp" class="container p-4"></div>
+    <script type="text/babel">
+      class App extends React.Component {
+        state = {
+          questions: [],
+          answers: {},
+          step: 0,
+          score: 0,
+        };
+
+        // โหลดข้อมูลจาก quiz.json
+        componentDidMount() {
+          fetch("Work1/quiz.json") // ปรับเส้นทางหากจำเป็น
+            .then((res) => res.json())
+            .then((data) => this.setState({ questions: data }))
+            .catch((err) => console.error("Error loading quiz data:", err));
+        }
+
+        // จัดการการเลือกคำตอบ
+        handleAnswer = (index, answer) => {
+          this.setState({
+            answers: { ...this.state.answers, [index]: answer },
+          });
+        };
+
+        // คำนวณคะแนน
+        calculateScore = () => {
+          const { questions, answers } = this.state;
+          let score = 0;
+          questions.forEach((q, i) => {
+            if (q.answer === answers[i]) score++;
+          });
+          this.setState({ score, step: 2 });
+        };
+
+        render() {
+          const { questions, step, score } = this.state;
+
+          // หน้าเริ่มต้น
+          if (step === 0) {
+            return (
+              <div className="card">
+                <div className="card-header">
+                  <b>Work3 :</b> แบบทดสอบ ด้วย ReactJS
+                </div>
+                <div className="card-body text-center">
+                  <h3>ยินดีต้อนรับสู่แบบทดสอบออนไลน์</h3>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => this.setState({ step: 1 })}
+                  >
+                    เริ่มทำแบบทดสอบ
+                  </button>
+                </div>
+                <div className="card-footer">643020641-0 วรภพ แก้วโพนเพ็ก</div>
+              </div>
+            );
+          }
+
+          // หน้าแสดงคำถาม
+          if (step === 1) {
+            return (
+              <div className="card">
+                <div className="card-header">
+                  <b>Work3 :</b> แบบทดสอบ ด้วย ReactJS
+                </div>
+                <div className="card-body">
+                  {questions.map((q, i) => (
+                    <div key={i} className="mb-4">
+                      <h5>{i + 1}. {q.title}</h5>
+                      {q.options.map((option, j) => (
+                        <div key={j}>
+                          <input
+                            type="radio"
+                            id={`q${i}-option${j}`}
+                            name={`q${i}`}
+                            value={j + 1}
+                            onChange={() => this.handleAnswer(i, j + 1)}
+                          />
+                          <label htmlFor={`q${i}-option${j}`} className="ms-2">{option}</label>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                  <button
+                    className="btn btn-success"
+                    onClick={this.calculateScore}
+                  >
+                    ตรวจคำตอบ
+                  </button>
+                </div>
+                <div className="card-footer">643020641-0 วรภพ แก้วโพนเพ็ก</div>
+              </div>
+            );
+          }
+
+          // หน้าแสดงคะแนน
+          if (step === 2) {
+            return (
+              <div className="card">
+                <div className="card-header">
+                  <b>Work3 :</b> แบบทดสอบ ด้วย ReactJS
+                </div>
+                <div className="card-body text-center">
+                  <h3>คุณได้คะแนน: {score} / {questions.length}</h3>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => this.setState({ step: 0, answers: {}, score: 0 })}
+                  >
+                    เริ่มใหม่
+                  </button>
+                </div>
+                <div className="card-footer">643020641-0 วรภพ แก้วโพนเพ็ก</div>
+              </div>
+            );
+          }
+
+          return null;
+        }
+      }
+
+      const container = document.getElementById('myapp');
+      const root = ReactDOM.createRoot(container);
+      root.render(<App />);
+    </script>
+  </body>
+</html>
